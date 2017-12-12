@@ -2,6 +2,7 @@ import React from 'react';
 import { Field } from 'redux-form';
 import styled from "styled-components";
 import { DropdownList } from 'react-widgets';
+import 'react-widgets/dist/css/react-widgets.css'
 
 
 const Root = styled.div`
@@ -48,12 +49,23 @@ const renderInput = ({input, edit}) => {
   )
 }
 
-const renderDropdownList = ({ input, data, valueField, textField }) =>
-  <DropdownList {...input}
-    data={data}
-    valueField={valueField}
-    textField={textField}
-    onChange={input.onChange} />
+const renderDropdownList = ({ input, data, valueField, textField, edit }) => {
+  return(
+    <div>
+    {edit ?
+      <DropdownList {...input}
+        data={data}
+        valueField={valueField}
+        textField={textField}
+        onChange={input.onChange} />
+      :
+      <p>{input.value.color}</p>
+    }
+    
+    </div>
+  )
+}
+
 
 
 class EditableField extends React.Component{
@@ -91,13 +103,13 @@ class EditableField extends React.Component{
 
 
   render(){
-    let { fieldType, data, label, name, placeholder, handleSubmit, value } = this.props
+    let { data, textField, fieldType, label, name, placeholder, handleSubmit, value } = this.props
     let {edit} = this.state
     return(
       <Root>
         <label>{label}</label>
           <div>
-          {fieldType == "input" ? 
+          {fieldType === "input" ? 
             <Field
               name={name}
               component={renderInput}
@@ -106,12 +118,14 @@ class EditableField extends React.Component{
               edit={edit}
             />
           : null}
-          {fieldType == "dropdown" ?
+          {fieldType === "dropdown" ?
             <Field
               name={name}
               component={renderDropdownList}
-              type="text"
               placeholder={placeholder}
+              edit={edit}
+              data={data}
+              textField={textField}
             />
             : null}
             </div> 

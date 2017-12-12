@@ -28,12 +28,12 @@ const SimpleForm = props => {
         />
 
       <RenderField
-        label="First Name"
-        name="firstName"
-        placeholder="First Name ... "
+        label="Color"
+        name="color"
         handleSubmit={handleSubmit}
         fieldType={"dropdown"}
         data={colors}
+        textField={"color"}
       />
       <div>
         <button type="submit" disabled={pristine || submitting}>Submit</button>
@@ -49,6 +49,7 @@ export default reduxForm({
   form: 'simple',
   initialValues: {
     lastName: "Dexter",
-    firstName: "Lab"
+    firstName: "Lab",
+    color: "Green"
     } // a unique identifier for this form
 })(SimpleForm);
