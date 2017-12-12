@@ -2,13 +2,15 @@ import React from 'react';
 import { Field } from 'redux-form';
 import styled from "styled-components";
 import { DropdownList } from 'react-widgets';
-import 'react-widgets/dist/css/react-widgets.css'
+import 'react-widgets/dist/css/react-widgets.css';
 
 
 const Root = styled.div`
   width: 100%;
+  &:hover{
+    background: grey;
+  }
 `
-
 
 const EditButton = styled.button`
   width: 40px;
@@ -43,7 +45,8 @@ const renderInput = ({input, edit}) => {
     <div>
     {edit ? 
       <Input {...input}></Input>
-    : <p>{input.value}</p>
+    : 
+      <p>{input.value}</p>
     }
     </div>
   )
@@ -67,7 +70,6 @@ const renderDropdownList = ({ input, data, valueField, textField, edit }) => {
 }
 
 
-
 class EditableField extends React.Component{
   constructor(props){
     super(props)
@@ -77,6 +79,11 @@ class EditableField extends React.Component{
     this.onEdit = this.onEdit.bind(this)
     this.onSave = this.onSave.bind(this)
     this.onCancel = this.onCancel.bind(this)
+    this.handleOutsideClick = this.handleOutsideClick.bind(this)
+  }
+
+  componentDidMount(){
+    document.addEventListener('click', this.handleOutsideClick, false);
   }
 
   onEdit(e){
@@ -101,42 +108,58 @@ class EditableField extends React.Component{
     })
   }
 
+  handleOutsideClick(e) {
+    e.preventDefault()
+    console.log(this.state)
+    // ignore clicks on the component itself
+    if (this[this.props.name + '-node'] && this[this.props.name + '-node'].contains(e.target)) {
+      this.setState({
+        edit: true
+      });
+    }else{
+      this.setState({
+        edit: false
+      });
+    }
+  }
 
   render(){
     let { data, textField, fieldType, label, name, placeholder, handleSubmit, value } = this.props
     let {edit} = this.state
     return(
       <Root>
-        <label>{label}</label>
+        <div ref={(node) => { this[name + '-node'] = node; }}>
+          <label>{label}</label>
           <div>
-          {fieldType === "input" ? 
-            <Field
-              name={name}
-              component={renderInput}
-              type="text"
-              placeholder={placeholder}
-              edit={edit}
-            />
-          : null}
-          {fieldType === "dropdown" ?
-            <Field
-              name={name}
-              component={renderDropdownList}
-              placeholder={placeholder}
-              edit={edit}
-              data={data}
-              textField={textField}
-            />
-            : null}
-            </div> 
-        {edit ?
-        <div>
-            <CancelButton onClick={this.onCancel}>X</CancelButton >
-            <EditButton onClick={this.onSave}>Save</EditButton>
-        </div>
-          : 
-          <EditButton onClick={this.onEdit}>Edit</EditButton>
-        }
+            {fieldType === "input" ?
+              <Field
+                name={name}
+                component={renderInput}
+                type="text"
+                placeholder={placeholder}
+                edit={edit}
+              />
+              : null}
+            {fieldType === "dropdown" ?
+              <Field
+                name={name}
+                component={renderDropdownList}
+                placeholder={placeholder}
+                edit={edit}
+                data={data}
+                textField={textField}
+              />
+              : null}
+          </div>
+          {edit ?
+            <div>
+              <CancelButton onClick={this.onCancel}>X</CancelButton >
+              <EditButton onClick={this.onSave}>Save</EditButton>
+            </div>
+            :
+            <EditButton onClick={this.onEdit}>Edit</EditButton>
+          }
+      </div>
       </Root>
     )
   }
